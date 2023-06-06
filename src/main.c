@@ -3,23 +3,23 @@
 
 int main(int argc, char** argv)
 {
-    char* src;
+    char src[100];
     printf("OptiScript > ");
-    scanf("%s", src);
+    while (fgets(src, sizeof(src), stdin) != NULL && strcmp(src, "exit();\n") != 0) {
+        src[strcspn(src, "\n")] = '\0'; // Remove trailing newline
 
-    while(src != "exit();") {
         Lexer lex;
         Token* tokens;
         initLexer(&lex, src);
         tokens = makeTokens(&lex);
-        for(int i = 0; i < strlen(src); i++) {
-            printf("%s:%s ", tokens[i].type, tokens[i].value);
+        for (int i = 0; i < lex.position; i++) {
+            char* str = tokenAsString(&tokens[i]);
+            printf("%s ", str);
+            free(str);
         }
         printf("\n");
         printf("OptiScript > ");
-        scanf("%s", src);
-
     }
-    
+
     return 0;
 }

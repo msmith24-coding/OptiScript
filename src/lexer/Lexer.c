@@ -18,91 +18,105 @@ void advanceLexer(Lexer *lexer)
     }
 }
 
-Token makeNumber(Lexer *lexer)
+Token* makeNumber(Lexer *lexer)
 {
-    Token result;
-    char* numString;
+    Token* result = (Token*)malloc(sizeof(Token));
+    char* numString = NULL;
     bool hasDecimal = false;
     bool isValid = true;
+    int position = 0;
 
-    while(isValid && (lexer->currentChar != 0 && (lexer->currentChar == '.' || isdigit(lexer->currentChar)))) {
-        if(lexer->currentChar == '.') {
-            if(hasDecimal) {
+    while (isValid && (lexer->currentChar != 0 && (lexer->currentChar == '.' || isdigit(lexer->currentChar)))) {
+        if (lexer->currentChar == '.') {
+            if (hasDecimal) {
                 isValid = false;
             } else {
                 hasDecimal = true;
-                numString += '.';
+                numString[position++] = '.';
             }
         } else {
-            numString += lexer->currentChar;
+            numString[position++] = lexer->currentChar;
         }
         advanceLexer(lexer);
     }
 
-    if(!hasDecimal) {
-        result.type = TT_INT;
-        result.value = numString;
-        return result;
-    } 
-    result.type = TT_FLOAT;
-    result.value = numString;
-    return result;
+    numString[position] = '\0';
 
+    if (!hasDecimal) {
+        result->type = TT_INT;
+    } else {
+        result->type = TT_FLOAT;
+    }
+    result->value = numString;
+
+    free(numString);
+
+    return result;
 }
 
 Token* makeTokens(Lexer *lexer)
 {
     int size = strlen(lexer->src);
-    Token* tokensArray = (Token*)malloc(size * sizeof(Token));
+    Token* tokensArray = (Token*)malloc((size + 1) * sizeof(Token)); // +1 for termination token
 
     if(tokensArray == NULL) {
         printf("[ERR] Memory allocation failed.");
         exit(1);
     }
 
+    int position = 0;
 
-    while(lexer->position < size) {
+    while (lexer->position < size) {
+        lexer->position = position; // Update lexer position
         if(lexer->currentChar == ' ' || lexer ->currentChar == '\t') {
             advanceLexer(lexer);
         }
         else if(isdigit(lexer->currentChar)) {
-            Token resultToken = makeNumber(lexer);
-            tokensArray[lexer->position].type = resultToken.type;
-            tokensArray[lexer->position].value = resultToken.value;
-            advanceLexer(lexer);
+            Token* resultToken = makeNumber(lexer);
+            tokensArray[position] = *resultToken;
+            position++;
+            free(resultToken->value);
+            free(resultToken);
         }
         else if(lexer->currentChar == '+') {
-            tokensArray[lexer->position].type = TT_PLUS;
-            tokensArray[lexer->position].value = "";
+            tokensArray[position].type = TT_PLUS;
+            tokensArray[position].value = "";
             advanceLexer(lexer);
+            position++;
         }
         else if(lexer->currentChar == '-') {
-            tokensArray[lexer->position].type = TT_MINUS;
-            tokensArray[lexer->position].value = "";
+            tokensArray[position].type = TT_MINUS;
+            tokensArray[position].value = "";
             advanceLexer(lexer);
+            position++;
         }
         else if(lexer->currentChar == '*') {
-            tokensArray[lexer->position].type = TT_MULTIPLY;
-            tokensArray[lexer->position].value = "";
+            tokensArray[position].type = TT_MULTIPLY;
+            tokensArray[position].value = "";
             advanceLexer(lexer);
+            position++;
         }
         else if(lexer->currentChar == '/') {
-            tokensArray[lexer->position].type = TT_DIVIDE;
-            tokensArray[lexer->position].value = "";
+            tokensArray[position].type = TT_DIVIDE;
+            tokensArray[position].value = "";
             advanceLexer(lexer);
+            position++;
         }
         else if(lexer->currentChar == '(') {
-            tokensArray[lexer->position].type = TT_LPAREN;
-            tokensArray[lexer->position].value = "";
+            tokensArray[position].type = TT_LPAREN;
+            tokensArray[position].value = "";
             advanceLexer(lexer);
+            position++;
         }
         else if(lexer->currentChar == ')') {
-            tokensArray[lexer->position].type = TT_RPAREN;
-            tokensArray[lexer->position].value = "";
+            tokensArray[position].type = TT_RPAREN;
+            tokensArray[position].value = "";
             advanceLexer(lexer);
+            position++;
         } else {
             exit(1);
         }
+        // position++;
     }
 
     return tokensArray;

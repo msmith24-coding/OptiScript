@@ -14,5 +14,6 @@
         "xutility": "c",
         "lexer.h": "c",
         "tokentype.h": "c"
-    }
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }

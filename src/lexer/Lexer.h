@@ -20,6 +20,6 @@ typedef struct /* Lexer Class */
 void initLexer(Lexer *lexer, char* src);
 void advanceLexer(Lexer *lexer);
 Token* makeTokens(Lexer *lexer);
-Token makeNumber(Lexer *lexer);
+Token* makeNumber(Lexer *lexer);
 
 #endif
