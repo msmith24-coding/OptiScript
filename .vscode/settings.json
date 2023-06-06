@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "*.mcmeta": "json",
+        "token.h": "c",
+        "string.h": "c",
+        "stdio.h": "c",
+        "compare": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "xmemory": "c",
+        "xstring": "c",
+        "xtr1common": "c",
+        "xutility": "c",
+        "lexer.h": "c",
+        "tokentype.h": "c"
+    }
+}
